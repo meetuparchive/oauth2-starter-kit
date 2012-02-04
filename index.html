@@ -5,32 +5,37 @@
     <script type="text/javascript" src="jquery.min.js"></script>
     <script type="text/javascript" src="mu.api.js"></script>
     <script type="text/javascript">
+      // initialize api
       api = mu.Api({
           clientId: "97271o4gabbrq7efdchn7fienh"
           , onMember: function(member, token) {
               $("#connect").hide(); $("#disconnect").show();
-              $.getJSON("https://api.meetup.com/2/groups?access_token=" + token + "&member_id=self&callback=?", function(grps) {
-                  var el = $("#groups"), buff = [];
-                  $.map(grps.results, function(g) {
-                      buff.push('<li>' + g.name.link(g.link) + '</li>');
+              $.getJSON("https://api.meetup.com/2/events?access_token=" + token +
+                        "&member_id=self&fields=short_link&page=10&callback=?", function(evts) {
+                  var el = $("#events"), buff = [];
+                  $.map(evts.results, function(e) {
+                      buff.push('<li>' + e.name.link(e.short_link) + '</li>');
                   });
                   el.append(buff.join(''));
               });
-              $("#member").html("<img class='avatar' src=" + member.photo.thumb_link + " /> Hey " + member.name.link(member.link) + ".");
+              $("#member").html(
+                  "<img class='avatar' src=" + member.photo.thumb_link + " /> Hey " +
+                      member.name.link(member.link) + " | <a href='#' id='disconnect'>Logout</a>");
           }
       });
       
       (function($){
           $(function() {
-              $("#connect").click(function(e) {
+              $("#connect").live('click', function(e) {
                   e.preventDefault();
                   api.login();
                   return false;
               });
-              $("#disconnect").hide().click(function(e){
+              $("#disconnect").live('click', function(e) {
                   e.preventDefault();
                   api.logout(function(){
                       $("#disconnect").hide(); $("#connect").show();
+                      window.location.reload();
                   });
                   return false;
               });
@@ -41,9 +46,9 @@
   <body>
     <div id="container">
       <h1>Meetup oauth2 js starter kit</h1>
-      <a id="connect" href="#">Connect with Meetup</a> <a id="disconnect" href="#">Disconnect</a>
+      <a id="connect" href="#">Connect with Meetup</a>
       <div id="member"></div>
-      <ul id="groups"></ul>
+      <ul id="events"></ul>
     </div>
   </body>
 </html>
