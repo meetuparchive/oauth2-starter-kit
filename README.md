@@ -8,7 +8,7 @@ Example usage
         <script type="text/javascript" src="mu.api.js"></script>
         <script type="text/javascript">
           api = mu.Api({
-            clientId: "97271o4gabbrq7efdchn7fienh"
+            clientId: "YOUR_MEETUP_CONSUMER_KEY"
             , onMember: function(member, token) {
               alert("we're in");
             }
