@@ -1,4 +1,4 @@
-# Meetup oauth2 sdk starter key
+# Meetup oauth2 sdk starter kit
 
 Example usage
 
