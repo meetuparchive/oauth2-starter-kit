@@ -1,0 +1,35 @@
+body {
+  font-family:helvetica, arial, sans serif;
+  font-size:24px;
+  line-height:1.5em;
+}
+
+#container {
+  width:960px; margin: 1em auto;
+}
+
+a:link, a:visited {
+  text-decoration:none;
+  color:#FF0066;
+}
+
+a:hover {
+  color:#C70050;
+}
+
+.avatar {
+  width:50px;
+  height:50px;
+  overflow:hidden;
+  border-radius:5px;
+}
+
+ul {
+  list-style:none;
+  margin:0;
+  padding:0;
+}
+
+li {
+  margin:.5em 0;
+}

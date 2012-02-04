@@ -1,40 +1,48 @@
 <html>
   <head>
     <title>meetup oauth2 starter</title>
-    <style>
-      body { font-family: helvetica, arial, sans serif; }
-      #container { width: 960px; margin: 0 auto;}
-    </style>
+    <link rel="stylesheet" href="mu.css"/>
     <script type="text/javascript" src="jquery.min.js"></script>
-    <script type="text/javascript" src="mu.oauth2.js"></script>
+    <script type="text/javascript" src="mu.api.js"></script>
     <script type="text/javascript">
-
-      mu.Api({
-          clientId: "97271o4gabbrq7efdchn7fienh",
-          afterAuth: function(member, token) {
-              console.log("afterAuth")
-          }, 
-          onMember: function(member, token) {
-              // make some call here
-              $.getJSON("https://api.meetup.com/2/groups?access_token=" + token + "&member_id=self&callback=?", function(grps){
-                  var el = $("#groups");
-                  var b = [];
+      api = mu.Api({
+          clientId: "97271o4gabbrq7efdchn7fienh"
+          , onMember: function(member, token) {
+              $("#connect").hide(); $("#disconnect").show();
+              $.getJSON("https://api.meetup.com/2/groups?access_token=" + token + "&member_id=self&callback=?", function(grps) {
+                  var el = $("#groups"), buff = [];
                   $.map(grps.results, function(g) {
-                      b.push('<li>' + g.name + '</li>');
+                      buff.push('<li>' + g.name.link(g.link) + '</li>');
                   });
-                  el.append(b.join(''));
+                  el.append(buff.join(''));
               });
-              $("#member").text("Hey " + member.name);
+              $("#member").html("<img class='avatar' src=" + member.photo.thumb_link + " /> Hey " + member.name.link(member.link) + ".");
           }
       });
-      // call mu.starter.logout(function() { /* called after credentials cleared */}) to clear credentials
+      
+      (function($){
+          $(function() {
+              $("#connect").click(function(e) {
+                  e.preventDefault();
+                  api.login();
+                  return false;
+              });
+              $("#disconnect").hide().click(function(e){
+                  e.preventDefault();
+                  api.logout(function(){
+                      $("#disconnect").hide(); $("#connect").show();
+                  });
+                  return false;
+              });
+          });
+      })(jQuery);
       </script>
   </head>
   <body>
     <div id="container">
-      <h1>Meetup <a href="http://www.meetup.com/meetup_api/auth/#oauth2">oauth2</a> starter</h1>
+      <h1>Meetup oauth2 js starter kit</h1>
+      <a id="connect" href="#">Connect with Meetup</a> <a id="disconnect" href="#">Disconnect</a>
       <div id="member"></div>
-      your groups are...
       <ul id="groups"></ul>
     </div>
   </body>
