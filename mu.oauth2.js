@@ -2,6 +2,9 @@
   win.mu = win.mu || {};
   win.mu.starter = {};
 
+  // assign this to your own client id
+  win.mu.starter.client_id = "97271o4gabbrq7efdchn7fienh";
+
   win.mu.starter.onAuthDenial = function(err) {
       console.log('override mu.starter.onAuthDenial = function(err)...');
       alert("sorry. authorization denied");
@@ -26,19 +29,19 @@
       after();
   };
 
-  // you key from a consumer http://www.meetup.com/meetup_api/oauth_consumers/
-  var client_id = "97271o4gabbrq7efdchn7fienh"
-
   // we support custom permission scopes
   //http://www.meetup.com/meetup_api/auth/#oauth2-scopes
-  , scopes = ['ageless']
+  var scopes = ['ageless'] 
 
-  // uri for member authorization
-  , authorization = "https://secure.meetup.com/oauth2/authorize/?response_type=token&client_id=" +
-        client_id + "&scope=" + scopes.join(',') + "&redirect_uri="
+  // uri for auth
+  , authorization = function() {
+      return "https://secure.meetup.com/oauth2/authorize/?response_type=token&client_id=" +
+          mu.starter.client_id + "&scope=" + scopes.join(',') + "&redirect_uri=";
+   }
 
   // basic call to get the authorized members data
-  , member = "https://api.meetup.com/2/member/self";
+   , member = "https://api.meetup.com/2/member/self";
+
 
   $(function() {
       
@@ -60,6 +63,7 @@
                             // cache a simple, more compact, representation of the authorized user
                             ls['mu_member'] = JSON.stringify(simple);
                             win.mu.starter.afterAuth(simple, ls['mu_token']);
+                            win.mu.starter.onMember(simple, ls['mu_token']);
                         });
           }
 
@@ -100,7 +104,7 @@
               // 2) set some window title
               // 3) set popup args (centering window)
               win.open(
-                  authorization + window.location.href, // 1
+                  authorization() + window.location.href, // 1
                   "Meetup",                             // 2
                   ["height=", height, ",width=", width, // 3
                    ",top=", top, ",left=", left].join(''));

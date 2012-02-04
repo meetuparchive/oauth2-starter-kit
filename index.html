@@ -7,12 +7,22 @@
     </style>
     <script type="text/javascript" src="jquery.min.js"></script>
     <script type="text/javascript" src="mu.oauth2.js"></script>
-    <script type="text/javascript" src="">
-      mu.starter.afterAuth = function(token, member){
+    <script type="text/javascript">
+
+      mu.starter.afterAuth = function(member, token) {
           console.log("afterAuth")
       };
-      mu.starter.onMember = function(token, member) {
-          console.log("onMember")
+      mu.starter.onMember = function(member, token) {
+          // make some call here
+          $.getJSON("https://api.meetup.com/2/groups?access_token=" + token + "&member_id=self&callback=?", function(grps){
+              var el = $("#groups");
+              var b = [];
+              $.map(grps.results, function(g) {
+                  b.push('<li>' + g.name + '</li>');
+              })
+              el.append(b.join(''));
+          });
+          $("#member").text("Hey " + member.name);
       }
       // call mu.starter.logout(function() { /* called after credentials cleared */}) to clear credentials
       </script>
@@ -21,6 +31,8 @@
     <div id="container">
       <h1>Meetup <a href="http://www.meetup.com/meetup_api/auth/#oauth2">oauth2</a> starter</h1>
       <div id="member"></div>
+      your groups are...
+      <ul id="groups"></ul>
     </div>
   </body>
 </html>
