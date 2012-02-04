@@ -1,0 +1,26 @@
+<html>
+  <head>
+    <title>meetup oauth2 starter</title>
+    <style>
+      body { font-family: helvetica, arial, sans serif; }
+      #container { width: 960px; margin: 0 auto;}
+    </style>
+    <script type="text/javascript" src="jquery.min.js"></script>
+    <script type="text/javascript" src="mu.oauth2.js"></script>
+    <script type="text/javascript" src="">
+      mu.starter.afterAuth = function(token, member){
+          console.log("afterAuth")
+      };
+      mu.starter.onMember = function(token, member) {
+          console.log("onMember")
+      }
+      // call mu.starter.logout(function() { /* called after credentials cleared */}) to clear credentials
+      </script>
+  </head>
+  <body>
+    <div id="container">
+      <h1>Meetup <a href="http://www.meetup.com/meetup_api/auth/#oauth2">oauth2</a> starter</h1>
+      <div id="member"></div>
+    </div>
+  </body>
+</html>
