@@ -9,21 +9,24 @@
     <script type="text/javascript" src="mu.oauth2.js"></script>
     <script type="text/javascript">
 
-      mu.starter.afterAuth = function(member, token) {
-          console.log("afterAuth")
-      };
-      mu.starter.onMember = function(member, token) {
-          // make some call here
-          $.getJSON("https://api.meetup.com/2/groups?access_token=" + token + "&member_id=self&callback=?", function(grps){
-              var el = $("#groups");
-              var b = [];
-              $.map(grps.results, function(g) {
-                  b.push('<li>' + g.name + '</li>');
-              })
-              el.append(b.join(''));
-          });
-          $("#member").text("Hey " + member.name);
-      }
+      mu.Api({
+          clientId: "97271o4gabbrq7efdchn7fienh",
+          afterAuth: function(member, token) {
+              console.log("afterAuth")
+          }, 
+          onMember: function(member, token) {
+              // make some call here
+              $.getJSON("https://api.meetup.com/2/groups?access_token=" + token + "&member_id=self&callback=?", function(grps){
+                  var el = $("#groups");
+                  var b = [];
+                  $.map(grps.results, function(g) {
+                      b.push('<li>' + g.name + '</li>');
+                  });
+                  el.append(b.join(''));
+              });
+              $("#member").text("Hey " + member.name);
+          }
+      });
       // call mu.starter.logout(function() { /* called after credentials cleared */}) to clear credentials
       </script>
   </head>
