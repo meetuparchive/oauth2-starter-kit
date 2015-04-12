@@ -1,11 +1,10 @@
 window.mu = window.mu || {};
 
-/** Provides a thin layer around an oauth2 follow for authorizing 
+/** Provides a thin layer around an oauth2 follow for authorizing
  *  a client to access a Meetup member's data
- *  @todo remove jquery dep for making ajax req 
  *  @todo make sure this works in older browsers */
-window.mu.Api = (function(win, $) {
-    return function(opts) {        
+window.mu.Api = (function(win) {
+    return function(opts) {
 
         // if user-agent supports local storage, use that, else just use memory
         var storageFallbacks = function() {
@@ -38,15 +37,15 @@ window.mu.Api = (function(win, $) {
         }
 
         // assign this to your own client id
-        var client_id = opts.clientId || alert("clientId required")
+        var client_id = opts.clientId || alert('clientId required')
 
         storage = opts.storage || storageFallbacks()
 
         // location to redirect member after when Meetup gets their
         // authorization
-        , redirectUri = opts.redirectUri || window.location.href
+        , redirectUri = opts.redirectUri || win.location.href
 
-        // function invoked when meetup user denies authorization 
+        // function invoked when meetup user denies authorization
         , onAuthDenial = opts.onAuthDenial || function(err) {
             alert('override onAuthDenial: function(err)...');
         }
@@ -59,7 +58,7 @@ window.mu.Api = (function(win, $) {
         // function invoked after a user authorizes and before
         // onMember
         , afterAuth = opts.afterAuth || function(mem, token) {
-            
+
         }
 
         // function invoked on a page refresh if a user is logged in
@@ -67,48 +66,72 @@ window.mu.Api = (function(win, $) {
             alert('override onMember: funciton(mem, token) ...');
         }
 
-        // support  for custom permission scopes
+        // support for custom permission scopes
         // http://www.meetup.com/meetup_api/auth/#oauth2-scopes
-        , scopes = opts.scopes || ['ageless'] 
+        , scopes = opts.scopes || ['ageless']
 
         // location for auth
-        , authorization = "https://secure.meetup.com/oauth2/authorize/?response_type=token&client_id=" +
-                client_id + "&scope=" + scopes.join(',') + "&redirect_uri=" + redirectUri
+        , authorization = 'https://secure.meetup.com/oauth2/authorize/?response_type=token&client_id=' +
+                client_id + '&scope=' + scopes.join(',') + '&redirect_uri=' + redirectUri
 
         // api call to get the authorized members data
-        , member = "https://api.meetup.com/2/member/self"
+        , member = 'https://api.meetup.com/2/member/self'
 
         , requestAuthorization = function() {
-            var width = 500, height = 350
+            var width = 600, height = 420
             , top = (screen.height - height)/2
             , left = (screen.width - width)/2;
             win.open(
                 authorization,
-                "Meetup",
-                ["height=", height, ",width=", width,
-                 ",top=", top, ",left=", left].join(''));    
+                'Meetup',
+                ['height=', height, ',width=', width,
+                 ',top=', top, ',left=', left].join(''));
         };
 
-        $(function() {
-      
+        if(win.addEventListener) {
+            win.addEventListener('load', store);
+        } else if(win.attachEvent) { // IE8 and bellow
+            win.attachEvent('load', store);
+        }
+
+        function CORSRequest(method, url) {
+            var xhr = new XMLHttpRequest();
+            if('withCredentials' in xhr) {
+                xhr.open(method, url, true);
+            } else if(XDomainRequest) { // IE support again
+                xhr = new XDomainRequest();
+                xhr.open(method, url);
+            }
+            return xhr;
+        }
+
+        function store() {
+
             if(storage) {
                 var ls = storage;
 
                 // user authorized client
                 win.onMeetupAuth = function(tok) {
                     ls.put('mu_token', tok);
-                    $.getJSON(member + "?callback=?", { "access_token": ls.get('mu_token') },
-                        function(mem){
+
+                    var url = member + '?access_token=' + ls.get('mu_token');
+                    function callback(e) {
+                        if(e.target.readyState === 4) {
+                            var mem = JSON.parse(e.target.response);
                             var simple = {
                                 id: mem.id,
                                 name: mem.name,
                                 link: mem.link,
                                 photo: mem.photo
-                            }
+                            };
                             ls.put('mu_member', JSON.stringify(simple));
                             afterAuth(simple, tok);
                             onMember(simple, tok);
-                        });
+                        }
+                    }
+                    var xhr = CORSRequest('GET', url);
+                    xhr.onload = callback;
+                    xhr.send();
                 };
 
                 // user denied client authorization
@@ -116,8 +139,9 @@ window.mu.Api = (function(win, $) {
                     onAuthDenial(err);
                 };
 
+                // executed within popup after redirect and main window
                 if(!ls.get('mu_token') || !ls.get('mu_member')) { // not "logged in"..
-                    var frag = window.location.hash;
+                    var frag = win.location.hash;
                     if(frag) {
                         var fp = frag.substring(1).split('&')
                         , i = fp.length
@@ -143,10 +167,10 @@ window.mu.Api = (function(win, $) {
                     onMember(JSON.parse(ls.get('mu_member')), ls.get('mu_token'));
                 }
             } else {
-                onUnsupportedStorage();         
+                onUnsupportedStorage();
             }
-        });
-    
+        }
+
         // return a means of logging out and in
         return {
             logout: function(after) {
@@ -159,4 +183,4 @@ window.mu.Api = (function(win, $) {
             }
         };
     };
-})(window, jQuery);
+})(window);
