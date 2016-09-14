@@ -1,6 +1,9 @@
 # Meetup oauth2 sdk starter kit
 
-Example usage
+Prior to doing this, you'll need to get your Meetup Consumer Key at: https://secure.meetup.com/meetup_api/oauth_consumers/
+As well, you'll need to test this on a server that resolves to the "Redirect URI" specified on your configured OAuth Consumer
+
+Example usage (for latest working example see index.html)
 
     <html>
       <head>
@@ -29,6 +32,3 @@ Example usage
       </head>
       <body></body>
     </html>
-
-
-

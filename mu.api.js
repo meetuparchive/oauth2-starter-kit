@@ -1,11 +1,14 @@
 window.mu = window.mu || {};
 
-/** Provides a thin layer around an oauth2 follow for authorizing 
+var MEETUP_OAUTH2_URL = "https://secure.meetup.com/oauth2/authorize/?response_type=token&client_id=";
+var MEETUP_API_SELF_URL = "https://api.meetup.com/2/member/self";
+
+/** Provides a thin layer around an oauth2 follow for authorizing
  *  a client to access a Meetup member's data
- *  @todo remove jquery dep for making ajax req 
+ *  @todo remove jquery dep for making ajax req
  *  @todo make sure this works in older browsers */
 window.mu.Api = (function(win, $) {
-    return function(opts) {        
+    return function(opts) {
 
         // if user-agent supports local storage, use that, else just use memory
         var storageFallbacks = function() {
@@ -46,7 +49,7 @@ window.mu.Api = (function(win, $) {
         // authorization
         , redirectUri = opts.redirectUri || window.location.href
 
-        // function invoked when meetup user denies authorization 
+        // function invoked when meetup user denies authorization
         , onAuthDenial = opts.onAuthDenial || function(err) {
             alert('override onAuthDenial: function(err)...');
         }
@@ -59,7 +62,7 @@ window.mu.Api = (function(win, $) {
         // function invoked after a user authorizes and before
         // onMember
         , afterAuth = opts.afterAuth || function(mem, token) {
-            
+
         }
 
         // function invoked on a page refresh if a user is logged in
@@ -69,14 +72,14 @@ window.mu.Api = (function(win, $) {
 
         // support  for custom permission scopes
         // http://www.meetup.com/meetup_api/auth/#oauth2-scopes
-        , scopes = opts.scopes || ['ageless'] 
+        , scopes = opts.scopes || ['ageless']
 
         // location for auth
-        , authorization = "https://secure.meetup.com/oauth2/authorize/?response_type=token&client_id=" +
+        , authorization = MEETUP_OAUTH2_URL +
                 client_id + "&scope=" + scopes.join(',') + "&redirect_uri=" + redirectUri
 
         // api call to get the authorized members data
-        , member = "https://api.meetup.com/2/member/self"
+        , member = MEETUP_API_SELF_URL
 
         , requestAuthorization = function() {
             var width = 500, height = 350
@@ -86,11 +89,11 @@ window.mu.Api = (function(win, $) {
                 authorization,
                 "Meetup",
                 ["height=", height, ",width=", width,
-                 ",top=", top, ",left=", left].join(''));    
+                 ",top=", top, ",left=", left].join(''));
         };
 
         $(function() {
-      
+
             if(storage) {
                 var ls = storage;
 
@@ -143,10 +146,10 @@ window.mu.Api = (function(win, $) {
                     onMember(JSON.parse(ls.get('mu_member')), ls.get('mu_token'));
                 }
             } else {
-                onUnsupportedStorage();         
+                onUnsupportedStorage();
             }
         });
-    
+
         // return a means of logging out and in
         return {
             logout: function(after) {
