@@ -5,12 +5,14 @@
     <script type="text/javascript" src="jquery.min.js"></script>
     <script type="text/javascript" src="mu.api.js"></script>
     <script type="text/javascript">
+    var MEETUP_API_EVENTS_URL = "https://api.meetup.com/2/events?access_token=";
+    var MEETUP_CLIENT_ID = "YOUR_MEETUP_CONSUMER_KEY;
       // initialize api
       api = mu.Api({
-          clientId: "97271o4gabbrq7efdchn7fienh"
+          clientId: MEETUP_CLIENT_ID
           , onMember: function(member, token) {
               $("#connect").hide(); $("#disconnect").show();
-              $.getJSON("https://api.meetup.com/2/events?access_token=" + token +
+              $.getJSON(MEETUP_API_EVENTS_URL + token +
                         "&member_id=self&fields=short_link&page=10&callback=?", function(evts) {
                   var el = $("#events"), buff = [];
                   $.map(evts.results, function(e) {
@@ -19,11 +21,10 @@
                   el.append(buff.join(''));
               });
               $("#member").html(
-                  "<img class='avatar' src=" + member.photo.thumb_link + " /> Hey " +
-                      member.name.link(member.link) + " | <a href='#' id='disconnect'>Logout</a>");
+                  "Hey " + member.name.link(member.link) + " | <a href='#' id='disconnect'>Logout</a>");
           }
       });
-      
+
       (function($){
           $(function() {
               $("#connect").live('click', function(e) {

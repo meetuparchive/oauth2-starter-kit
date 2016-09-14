@@ -1,6 +1,6 @@
 # Meetup oauth2 sdk starter kit
 
-Example usage
+Example usage (for latest working example see index.html)
 
     <html>
       <head>
@@ -29,6 +29,3 @@ Example usage
       </head>
       <body></body>
     </html>
-
-
-
